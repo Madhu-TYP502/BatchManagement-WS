@@ -1,0 +1,30 @@
+spring:  
+  application:
+    name: batch-mng-ws
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        instance-id: "${spring.application.name}:${random.int[1,999999]}"
+
+
+server.port: 0
+
+---
+spring:
+  profiles:
+    active: zone1
+  cloud:
+    consul:
+      discovery:
+        instanceZone: zone1
+
+---
+spring:
+  profiles:
+    active: zone2
+  cloud:
+    consul:
+      discovery:
+        instanceZone: zone2

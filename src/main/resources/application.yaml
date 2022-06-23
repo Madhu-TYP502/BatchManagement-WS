@@ -1,0 +1,32 @@
+spring:  
+  application:
+    name: batch-mng-ws
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+  output.ansi.enabled: ALWAYS
+
+  data:
+    mongodb:
+      database: AdminDashboard
+      port: 27017
+      host: localhost
+
+---
+spring:
+  profiles:
+    active: zone1
+  cloud:
+    consul:
+      discovery:
+        instanceZone: zone1
+
+---
+spring:
+  profiles:
+    active: zone2
+  cloud:
+    consul:
+      discovery:
+        instanceZone: zone2
