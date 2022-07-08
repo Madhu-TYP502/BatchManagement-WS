@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,7 @@ import com.tyss.dashboard.batch.mng.entity.BatchEntity;
 import com.tyss.dashboard.batch.mng.services.BatchServicesImpl;
 
 @RestController
-@RequestMapping("batchmng/")
+@RequestMapping("batch/")
 public class BatchController {
 
 	@Autowired
@@ -39,33 +40,35 @@ public class BatchController {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body("Workking...");
 	}
 	
-	@PostMapping("create/batch")
-	public ResponseEntity<String> createBatch(@RequestBody BatchDto batchDto) {
+	@PostMapping("add")
+	public ResponseEntity<BatchEntity> createBatch(@RequestBody BatchDto batchDto) {
 
+		System.out.println("BatchController : inside create batch");
 		return batchServicesImpl.createBatch(mapper.map(batchDto, BatchEntity.class));
 	}
 
-	@GetMapping("get/batch")
-	public ResponseEntity<BatchEntity> viewBatch(@RequestParam String batchCode) {
+	@GetMapping("get")
+	public ResponseEntity<BatchEntity> getBatch(@RequestParam String batchCode) {
 
 		return batchServicesImpl.viewBatch(batchCode);
 	}
+	
+	@GetMapping("get/all")
+	public List<BatchEntity> getAllBatches() {
 
-	@GetMapping("get/trainer/batch")
-	public ResponseEntity<List<BatchEntity>> viewBatchByTrainer(@RequestParam String trainerID) {
-
-		return batchServicesImpl.viewBatchByTrainer(trainerID);
+		return batchServicesImpl.getAllBatches();
 	}
 
-	@PostMapping("update/batch")
-	public ResponseEntity<String> updateBatch(@RequestBody BatchEntity batch) {
+
+	@PutMapping("put")
+	public ResponseEntity<BatchEntity> updateBatch(@RequestBody BatchEntity batch) {
 
 		return batchServicesImpl.updateBatch(batch);
 	}
 
-	@DeleteMapping("delete/batch")
-	public ResponseEntity<String> deleteBatch(@RequestBody BatchEntity batch) {
+	@DeleteMapping("delete")
+	public ResponseEntity<String> deleteBatch(@RequestParam String batchID) {
 
-		return batchServicesImpl.deleteBatch(batch);
+		return batchServicesImpl.deleteBatch(batchID);
 	}
 }

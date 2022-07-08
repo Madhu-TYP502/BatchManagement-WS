@@ -1,18 +1,14 @@
 package com.tyss.dashboard.batch.mng.services;
 
 import java.util.List;
+import java.util.UUID;
 
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tyss.dashboard.batch.mng.dto.BatchDto;
 import com.tyss.dashboard.batch.mng.entity.BatchEntity;
 import com.tyss.dashboard.batch.mng.repository.BatchRepository;
 import com.tyss.dashboard.batch.mng.repository.UserRepository;
@@ -30,102 +26,63 @@ public class BatchServicesImpl implements BatchServices {
 	MongoTemplate mongoTemplate;
 
 	@Override
-	public ResponseEntity<String> createBatch(BatchEntity batch) {
+	public ResponseEntity<BatchEntity> createBatch(BatchEntity batch) {
+		System.out.println("BatchServicesImpl : inside create batch");
+
 		if (batchRepository.existsByBatchCode(batch.getBatchCode())) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body("$Batch already exists with " + batch.getBatchCode() + " already exists!!");
-		} else if (!userRepository.existsByPhone(batch.getTrainerID())) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("$Trainer " + "'" + batch.getTrainerName() + "'"
-					+ " do not exists!! please add the trainer and try again");
+			System.out.println("BatchServicesImpl : batch exists");
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(batch);
 		}
-
-		batch.setId(batch.hashCode());
-		batch.setTrainerID(userRepository.findByName(batch.getTrainerName()).getPhone());
+		batch.setId(UUID.randomUUID().toString());
 		System.out.println(batch);
-		batchRepository.save(batch);
-		
 
-		ModelMapper mapper = new ModelMapper();
-		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-
-		BatchDto batchDto = mapper.map(batch, BatchDto.class);
-		String batchJson = "";
-		try {
-			batchJson = new ObjectMapper().writeValueAsString(batchDto);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(batchJson);
+		return ResponseEntity.status(HttpStatus.OK).body(batchRepository.save(batch));
 	}
 
 	@Override
-	public ResponseEntity<String> updateBatch(BatchEntity batch) {
-		BatchEntity dbBatch = batchRepository.findByBatchCode(batch.getBatchCode());
+	public ResponseEntity<BatchEntity> updateBatch(BatchEntity batch) {
+		BatchEntity dbBatch = batchRepository.findById(batch.getId()).get();
 
 		if (dbBatch != null) {
 			if (userRepository.existsByName(batch.getTrainerName())) {
 				batch.setId(dbBatch.getId());
-				batchRepository.save(batch);
-
-				ModelMapper mapper = new ModelMapper();
-				mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-
-				BatchDto batchDto = mapper.map(batch, BatchDto.class);
-
-				String batchJson = "";
-				try {
-					batchJson = new ObjectMapper().writeValueAsString(batchDto);
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-
-				return ResponseEntity.status(HttpStatus.ACCEPTED).body(batchJson);
-
+				return ResponseEntity.status(HttpStatus.OK).body(batchRepository.save(batch));
 			} else {
-				return ResponseEntity.badRequest().body("$Trainer " + "'" + batch.getTrainerName() + "'"
-						+ " do not exists!! please add the trainer and try again");
+				return ResponseEntity.badRequest().body(null);
 			}
 		}
-
-		return ResponseEntity.badRequest().body("$Batch do not exists with " + batch.getBatchCode());
+		return ResponseEntity.badRequest().body(null);
 
 	}
 
 	@Override
-	public ResponseEntity<String> deleteBatch(BatchEntity batch) {
+	public ResponseEntity<String> deleteBatch(String batchID) {
 
-		BatchEntity dbBatch = batchRepository.findByBatchCode(batch.getBatchCode());
+		BatchEntity dbBatch = batchRepository.findById(batchID).get();
 
 		if (dbBatch != null) {
-			batch.setId(dbBatch.getId());
-			batchRepository.delete(batch);
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body("$Batch data deleted susccesfully!!");
+			batchRepository.delete(dbBatch);
+			return ResponseEntity.status(HttpStatus.OK).body("Batch data deleted susccesfully!!");
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body("$Batch code " + "'" + batch.getBatchCode() + "'" + " do not exists!!!");
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Batch code do not exists");
 	}
 
 	@Override
 	public ResponseEntity<BatchEntity> viewBatch(String batchCode) {
+
 		BatchEntity batch = batchRepository.findByBatchCode(batchCode);
 
 		if (batch != null) {
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(batch);
+			return ResponseEntity.status(HttpStatus.OK).header("batchID", batch.getId()).body(batch);
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(batch);
 		}
 	}
-	
-	@Override
-	public ResponseEntity<List<BatchEntity>> viewBatchByTrainer(String trainerID) {
-		
-		List<BatchEntity> batch = batchRepository.findAllByTrainerID(trainerID);
 
-		if (batch != null) {
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(batch);
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(batch);
-		}
+	@Override
+	public List<BatchEntity> getAllBatches() {
+
+		return batchRepository.findAll();
 	}
+
 }

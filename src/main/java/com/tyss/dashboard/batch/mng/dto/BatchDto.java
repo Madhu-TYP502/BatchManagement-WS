@@ -8,8 +8,6 @@ public class BatchDto {
 
 	private String trainerName;
 
-	private String trainerID;
-
 	public String getBatchCode() {
 		return batchCode;
 	}
@@ -37,14 +35,6 @@ public class BatchDto {
 	@Override
 	public String toString() {
 		return "batchCode=" + batchCode + ", branch=" + branch + ", trainerName" + trainerName;
-	}
-
-	public String getTrainerID() {
-		return trainerID;
-	}
-
-	public void setTrainerID(String trainerID) {
-		this.trainerID = trainerID;
 	}
 
 }

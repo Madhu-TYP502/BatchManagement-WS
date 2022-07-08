@@ -13,7 +13,7 @@ public class BatchEntity implements Serializable {
 	private static final long serialVersionUID = 3748974027011822813L;
 
 	@Id
-	private long id;
+	private String id;
 
 	@NotNull
 	private String batchCode;
@@ -24,14 +24,11 @@ public class BatchEntity implements Serializable {
 	@NotNull
 	private String trainerName;
 	
-	@NotNull
-	private String trainerID;
-
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -57,13 +54,5 @@ public class BatchEntity implements Serializable {
 
 	public void setTrainerName(String trainerName) {
 		this.trainerName = trainerName;
-	}
-
-	public String getTrainerID() {
-		return trainerID;
-	}
-
-	public void setTrainerID(String trainerID) {
-		this.trainerID = trainerID;
 	}
 }

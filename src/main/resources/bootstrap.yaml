@@ -1,6 +1,6 @@
 spring:  
   application:
-    name: batch-mng-ws
+    name: batch-ws
   cloud:
     consul:
       host: localhost

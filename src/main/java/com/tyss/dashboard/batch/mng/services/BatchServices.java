@@ -7,13 +7,13 @@ import org.springframework.http.ResponseEntity;
 import com.tyss.dashboard.batch.mng.entity.BatchEntity;
 
 public interface BatchServices {
-	public ResponseEntity<String> createBatch(BatchEntity batch);
+	public ResponseEntity<BatchEntity> createBatch(BatchEntity batch);
 
-	public ResponseEntity<String> deleteBatch(BatchEntity Batch);
+	public ResponseEntity<String> deleteBatch(String batchID);
 
-	public ResponseEntity<String> updateBatch(BatchEntity batch);
+	public ResponseEntity<BatchEntity> updateBatch(BatchEntity batch);
 
 	public ResponseEntity<BatchEntity> viewBatch(String batchCode);
 
-	public ResponseEntity<List<BatchEntity>> viewBatchByTrainer(String trainerID);
+	public List<BatchEntity> getAllBatches();
 }
